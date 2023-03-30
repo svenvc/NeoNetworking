@@ -53,6 +53,15 @@ BasicTCPServer class >> shutDown: quiting [
 			self managedServers do: [ :each | each stop: false ] ]
 ]
 
+{ #category : #public }
+BasicTCPServer class >> startOn: port [
+	"self startOn: 4999"
+
+	^ self new
+		port: port;
+		start
+]
+
 { #category : #'system startup' }
 BasicTCPServer class >> startUp: resuming [
 	"Our system startUp hook: start all servers we manage.
@@ -62,6 +71,13 @@ BasicTCPServer class >> startUp: resuming [
 		ifTrue: [
 			SessionManager default currentSession addDeferredStartupAction: [
 				self managedServers do: [ :each | each start ] ] ]
+]
+
+{ #category : #registry }
+BasicTCPServer class >> unregister: server [
+	"No longer send server start/stop on system startUp/shutDown"
+
+	self managedServers remove: server ifAbsent: [ ]
 ]
 
 { #category : #accessing }
@@ -120,6 +136,13 @@ BasicTCPServer >> initializeServerSocket [
 		serverSocket listenOn: self port backlogSize: self backlogSize interface: bindingAddress ].
 	serverSocket isValid
 		ifFalse: [ self error: 'Cannot create socket on port ' , self port printString ]
+]
+
+{ #category : #testing }
+BasicTCPServer >> isRunning [
+	"Return true when I am running"
+
+	^ process notNil and: [ serverSocket notNil ]
 ]
 
 { #category : #protocol }
