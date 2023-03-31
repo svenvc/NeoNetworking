@@ -33,15 +33,16 @@ ExampleAssetPricingServer >> handleConnection: stream [
 
 { #category : #protocol }
 ExampleAssetPricingServer >> readCommand: stream [
-	| bytes key first second |
+	| bytes byteStream key first second |
 	^ [
-		bytes := (stream next: 9) readStream.
-		"self log: ('Read command: {1}' format: { bytes hex })."
-		key := bytes next.
-		first := bytes int32.
-		second := bytes int32.
+		bytes := stream next: 9.
+		self log: ('Read command {1}' format: { bytes hex asUppercase }).
+		byteStream := bytes readStream.
+		key := byteStream next.
+		first := byteStream int32.
+		second := byteStream int32.
 		{ #key -> key asCharacter. #first -> first. #second -> second } asDictionary ]
-			on: Error do: [ "self log: 'Read command: nil'." nil ]
+			on: Error do: [ self log: 'Read empty command'. nil ]
 ]
 
 { #category : #writing }
@@ -50,5 +51,5 @@ ExampleAssetPricingServer >> writeResponse: average to: stream [
 	response := ByteArray streamContents: [ :out |
 		            out int32: average asFloat truncated ].
 	stream nextPutAll: response; flush.
-	self log: ('Wrote response: {1}' format: { response hex })
+	self log: ('Wrote response {1}' format: { response hex })
 ]

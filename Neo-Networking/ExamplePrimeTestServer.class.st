@@ -16,12 +16,12 @@ Class {
 	#category : #'Neo-Networking'
 }
 
-{ #category : #protocol }
+{ #category : #responses }
 ExamplePrimeTestServer >> baseResponse [
 	^ { #method -> #isPrime } asOrderedDictionary
 ]
 
-{ #category : #protocol }
+{ #category : #responses }
 ExamplePrimeTestServer >> errorResponse: errorMessage [
 	^ self baseResponse
 			at: #error put: errorMessage;
@@ -48,7 +48,7 @@ ExamplePrimeTestServer >> handleIsPrimeRequest: json [
 	(json at: #method ifAbsent: [ nil ]) = #isPrime
 		ifFalse: [ ^ self errorResponse: 'Unsupported method' ].
 	(number := json at: #number ifAbsent: [ nil ]) isNumber
-		ifFalse: [ ^ self errorResponse: 'Number must be an number' ].
+		ifFalse: [ ^ self errorResponse: 'Not a number' ].
 	isPrime := number isInteger and: [ number isPrime ].
 	^ self resultResponse: isPrime
 ]
@@ -57,11 +57,11 @@ ExamplePrimeTestServer >> handleIsPrimeRequest: json [
 ExamplePrimeTestServer >> readLineFrom: input [
 	| line |
 	line := [ input nextLine ] on: Error do: [ nil ].
-	self log: ('Read line: {1}' format: { line }).
+	self log: ('Read {1}' format: { line }).
 	^ line
 ]
 
-{ #category : #protocol }
+{ #category : #responses }
 ExamplePrimeTestServer >> resultResponse: boolean [
 	^ self baseResponse
 			at: #prime put: boolean;
@@ -70,6 +70,6 @@ ExamplePrimeTestServer >> resultResponse: boolean [
 
 { #category : #protocol }
 ExamplePrimeTestServer >> writeLine: line to: output [
-	self log: ('Wrote line: {1}' format: { line }).
+	self log: ('Wrote {1}' format: { line }).
 	^ [ output nextPutAll: line; lf; flush ] on: Error do: [ nil ]
 ]

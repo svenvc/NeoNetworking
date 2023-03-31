@@ -122,6 +122,7 @@ BasicTCPServer >> handleConnection: stream [
 	[ stream atEnd ] whileFalse: [
 		"Be extra careful, EOF is often only seen after reading"
 		stream next ifNotNil: [ :byte |
+			self log: ('Echoing byte: {1}' format: { byte }).
 			stream nextPut: byte; flush ] ]
 ]
 
@@ -136,7 +137,8 @@ BasicTCPServer >> initializeServerSocket [
 			serverSocket listenOn: self port backlogSize: self backlogSize interface: bindingAddress ].
 	serverSocket isValid
 		ifFalse: [ self error: 'Cannot create socket on port ' , self port printString ].
-	self log: ('Started {1}' format: { self })
+	self port isZero
+		ifTrue: [ self log: ('OS assigned port = {1}' format: { serverSocket port }) ]
 ]
 
 { #category : #testing }
@@ -153,14 +155,14 @@ BasicTCPServer >> listenLoop [
 	- if not we just make a recursive call to this method to start over."
 
 	self initializeServerSocket.
-	[ [
+	[
+		[
 		serverSocket isValid
 			ifFalse: [
 				"will trigger #ifCurtailed: block and destroy socket"
 				^ self listenLoop ].
-		self serveConnectionsOn: serverSocket ] repeat ]
-
-		ifCurtailed: [ self releaseServerSocket ]
+		self serveConnectionOn: serverSocket ] repeat
+	] ifCurtailed: [ self releaseServerSocket ]
 ]
 
 { #category : #private }
@@ -174,7 +176,7 @@ BasicTCPServer >> log: message [
 		out nextPut: $..
 		out nextPutAll: ((now nanoSecond // 1e6) printPaddedWith: $0 to: 3).
 		out space.
-		Processor activeProcess hash printOn: out base: 36 showRadix: false.
+		Processor activeProcess hash printOn: out base: 36 length: 6 padded: true.
 		out space.
 		out nextPutAll: message ]) traceCr
 ]
@@ -203,14 +205,13 @@ BasicTCPServer >> printOn: stream [
 BasicTCPServer >> releaseServerSocket [
 	(Delay forMilliseconds: 10) wait.
 	serverSocket destroy.
-	self log: ('Stopped {1}' format: { self }).
 	serverSocket := nil
 ]
 
 { #category : #protocol }
-BasicTCPServer >> serveConnectionsOn: listeningSocket [
+BasicTCPServer >> serveConnectionOn: listeningSocket [
 	"We wait up to acceptWaitTimeout seconds for an incoming connection.
-	If we get one we wrap it in a SocketStream and #executeRequestResponseLoopOn: on it"
+	If we get one we wrap it in a SocketStream and fork #handleConnection: on it"
 
 	| stream socket |
 	socket := listeningSocket waitForAcceptFor: self acceptWaitTimeout.
@@ -253,11 +254,10 @@ BasicTCPServer >> start [
 BasicTCPServer >> start: register [
 	self stop.
 	register ifTrue: [ self class register: self ].
-	process := [
-		[ self listenLoop ] repeat
-	]
+	process := [ self listenLoop ]
 		forkAt: self serverProcessPriority
-		named: self serverProcessName
+		named: self serverProcessName.
+	self log: ('Started {1}' format: { self serverProcessName })
 ]
 
 { #category : #public }
@@ -270,7 +270,8 @@ BasicTCPServer >> stop: unregister [
 	unregister ifTrue: [ self class unregister: self ].
 	self isRunning ifFalse: [ ^ self ].
 	process terminate.
-	process := nil
+	process := nil.
+	self log: ('Stopped {1}' format: { self serverProcessName })
 ]
 
 { #category : #accessing }
