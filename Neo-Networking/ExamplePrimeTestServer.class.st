@@ -54,7 +54,10 @@ ExamplePrimeTestServer >> handleIsPrimeRequest: json [
 
 { #category : #protocol }
 ExamplePrimeTestServer >> readLineFrom: input [
-	^ [ input nextLine ] on: Error do: [ nil ]
+	| line |
+	line := [ input nextLine ] on: Error do: [ nil ].
+	self log: ('Read line: {1}' format: { line }).
+	^ line
 ]
 
 { #category : #protocol }
@@ -66,5 +69,6 @@ ExamplePrimeTestServer >> resultResponse: boolean [
 
 { #category : #protocol }
 ExamplePrimeTestServer >> writeLine: line to: output [
+	self log: ('Wrote line: {1}' format: { line }).
 	^ [ output nextPutAll: line; lf; flush ] on: Error do: [ nil ]
 ]

@@ -132,10 +132,11 @@ BasicTCPServer >> initializeServerSocket [
 	bindingAddress
 		ifNil: [
 			serverSocket listenOn: self port backlogSize: self backlogSize ]
-	ifNotNil: [
-		serverSocket listenOn: self port backlogSize: self backlogSize interface: bindingAddress ].
+		ifNotNil: [
+			serverSocket listenOn: self port backlogSize: self backlogSize interface: bindingAddress ].
 	serverSocket isValid
-		ifFalse: [ self error: 'Cannot create socket on port ' , self port printString ]
+		ifFalse: [ self error: 'Cannot create socket on port ' , self port printString ].
+	self log: ('Started {1}' format: { self })
 ]
 
 { #category : #testing }
@@ -162,6 +163,22 @@ BasicTCPServer >> listenLoop [
 		ifCurtailed: [ self releaseServerSocket ]
 ]
 
+{ #category : #private }
+BasicTCPServer >> log: message [
+	| now |
+	now := DateAndTime now.
+	(String streamContents: [ :out |
+		now printYMDOn: out.
+		out space.
+		now printHMSOn: out.
+		out nextPut: $..
+		out nextPutAll: ((now nanoSecond // 1e6) printPaddedWith: $0 to: 3).
+		out space.
+		Processor activeProcess hash printOn: out base: 36 showRadix: false.
+		out space.
+		out nextPutAll: message ]) traceCr
+]
+
 { #category : #accessing }
 BasicTCPServer >> port [
 	^ port ifNil: [ port := self defaultPort ]
@@ -177,7 +194,8 @@ BasicTCPServer >> printOn: stream [
 	super printOn: stream.
 	stream << $(.
 	self isRunning
-		ifTrue: [ stream << #running; space; print: self actualPort ].
+		ifTrue: [ stream << #running; space; print: self actualPort ]
+		ifFalse: [ stream print: self port ].
 	stream << $)
 ]
 
@@ -185,6 +203,7 @@ BasicTCPServer >> printOn: stream [
 BasicTCPServer >> releaseServerSocket [
 	(Delay forMilliseconds: 10) wait.
 	serverSocket destroy.
+	self log: ('Stopped {1}' format: { self }).
 	serverSocket := nil
 ]
 
@@ -197,11 +216,15 @@ BasicTCPServer >> serveConnectionsOn: listeningSocket [
 	socket := listeningSocket waitForAcceptFor: self acceptWaitTimeout.
 	socket ifNil: [ ^ self ].
 	stream := self socketStreamOn: socket.
-	[ [ [ self handleConnection: stream ]
-		ensure: [ stream close ] ]
-			ifCurtailed: [ socket destroy ] ]
-				forkAt: self workerProcessPriority
-				named: self workerProcessName
+	[ [ [
+			self log: 'Handling connection'.
+			self handleConnection: stream ]
+		ensure: [
+			self log: 'Ending connection'.
+			stream close ] ]
+				ifCurtailed: [ socket destroy ] ]
+					forkAt: self workerProcessPriority
+					named: self workerProcessName
 ]
 
 { #category : #accessing }
