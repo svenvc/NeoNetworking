@@ -42,14 +42,15 @@ ExamplePrimeTestServer >> handleConnection: stream [
 
 { #category : #protocol }
 ExamplePrimeTestServer >> handleIsPrimeRequest: json [
-	| number |
+	| number isPrime |
 	json isDictionary
 		ifFalse: [ ^ self errorResponse: 'Invalid JSON' ].
 	(json at: #method ifAbsent: [ nil ]) = #isPrime
 		ifFalse: [ ^ self errorResponse: 'Unsupported method' ].
-	(number := json at: #number ifAbsent: [ nil ]) isInteger
-		ifFalse: [ ^ self errorResponse: 'Number must be an integer' ].
-	^ self resultResponse: (number positive and: [ number isPrime ])
+	(number := json at: #number ifAbsent: [ nil ]) isNumber
+		ifFalse: [ ^ self errorResponse: 'Number must be an number' ].
+	isPrime := number isInteger and: [ number isPrime ].
+	^ self resultResponse: isPrime
 ]
 
 { #category : #protocol }
