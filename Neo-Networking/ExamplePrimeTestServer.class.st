@@ -47,9 +47,9 @@ ExamplePrimeTestServer >> handleIsPrimeRequest: json [
 		ifFalse: [ ^ self errorResponse: 'Invalid JSON' ].
 	(json at: #method ifAbsent: [ nil ]) = #isPrime
 		ifFalse: [ ^ self errorResponse: 'Unsupported method' ].
-	((number := json at: #number ifAbsent: [ nil ]) isInteger and: [ number positive ])
-		ifFalse: [ ^ self errorResponse: 'Number must be a positive integer' ].
-	^ self resultResponse: number isPrime
+	(number := json at: #number ifAbsent: [ nil ]) isInteger
+		ifFalse: [ ^ self errorResponse: 'Number must be an integer' ].
+	^ self resultResponse: (number positive and: [ number isPrime ])
 ]
 
 { #category : #protocol }
