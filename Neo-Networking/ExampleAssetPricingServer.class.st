@@ -6,6 +6,8 @@ Protocol
 
 I <int32> <int32> - insert <timestamp> <price>
 Q <int32> <int32> - query <mintime> <maxtime>
+
+Implements and conforms to [Means to an End] https://protohackers.com/problem/2
 "
 Class {
 	#name : #ExampleAssetPricingServer,
@@ -45,7 +47,7 @@ ExampleAssetPricingServer >> readCommand: stream [
 			on: Error do: [ self log: 'Read empty command'. nil ]
 ]
 
-{ #category : #writing }
+{ #category : #protocol }
 ExampleAssetPricingServer >> writeResponse: average to: stream [
 	| response |
 	response := ByteArray streamContents: [ :out |

@@ -9,7 +9,9 @@ Example:
 
 	BasicTCPServer new start.
 	
-	nc localhost 9999
+Implements and conforms to [Smoke Test] https://protohackers.com/problem/0
+	
+
 "
 Class {
 	#name : #BasicTCPServer,

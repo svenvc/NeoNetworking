@@ -9,6 +9,8 @@ Request
 Response
 
     {""method"":""isPrime"",""prime"":false}
+
+Implements and conforms to [Prime Time] https://protohackers.com/problem/1
 "
 Class {
 	#name : #ExamplePrimeTestServer,
