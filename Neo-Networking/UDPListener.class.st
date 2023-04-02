@@ -3,7 +3,7 @@ UDPListener helps in receiving UDP Datagrams on a certain port.
 
 	| listener response |
 	listener := UDPListener onPort: 12345.
-	response := listener receiveDatagramTimeout: 5 minutes.
+	response := listener receiveDatagramTimeout: 5 * 60.
 	listener close. 
 	response.
 
