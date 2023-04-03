@@ -1,6 +1,7 @@
 "
 I am BasicUDPServer.
 I am a AbstractNetworkServer.
+I handle incoming datagrams in my main process.
 
 Out of the box I implement an RFC 862 Echo service.
 "

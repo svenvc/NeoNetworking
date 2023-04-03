@@ -3,7 +3,7 @@ I am AbstractNetworkServer, a framework for a network service listening on a soc
 
 I am meant to be subclassed to implement specific protocols. Consider overwriting almost every method, if needed.
 
-I offer process management (start, stop), configuration (host, port), constansts and logging.
+I offer process management (start, stop), configuration (host, port), constants and transcript logging.
 
 "
 Class {

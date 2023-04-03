@@ -64,6 +64,11 @@ Datagram >> buffer: aStringOrByteArray [
 ]
 
 { #category : #accessing }
+Datagram >> capacity [
+	^ buffer ifNil: [ 0 ] ifNotNil: [ buffer size ]
+]
+
+{ #category : #accessing }
 Datagram >> contents [
 	^ self buffer copyFrom: 1 to: self length
 ]
@@ -143,4 +148,9 @@ Datagram >> reset [
 Datagram >> setContents: data [
 	self buffer: data.
 	self length: data size
+]
+
+{ #category : #accessing }
+Datagram >> size [
+	^ self length
 ]
