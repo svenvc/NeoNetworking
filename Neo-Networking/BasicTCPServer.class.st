@@ -5,7 +5,7 @@ I fork a connection handler process to service each client.
 
 Out of the box I implement an RFC 862 Echo service.
 
-I am meant to be subclassed to implement other protocols. Consider overwriting almost every method, if needed.
+I am meant to be subclassed to implement other protocols. Consider overwriting almost any method, if needed.
 
 Example:
 

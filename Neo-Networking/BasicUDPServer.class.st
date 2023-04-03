@@ -1,9 +1,11 @@
 "
-I am BasicUDPServer.
+I am BasicUDPServer, a framework for a UDP network service listening on a socket, accepting and servicing incoming datagrams.
 I am a AbstractNetworkServer.
 I handle incoming datagrams in my main process.
 
 Out of the box I implement an RFC 862 Echo service.
+
+I am meant to be subclassed to implement other protocols. Consider overwriting almost any method, if needed.
 "
 Class {
 	#name : #BasicUDPServer,

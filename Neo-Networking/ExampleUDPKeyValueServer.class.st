@@ -3,7 +3,7 @@ I am ExampleUDPKeyValueServer.
 I am a BasicUDPServer.
 
 Datagram key=value does an insert, no reply
-Datagran key does a retrieve, reply is value if it exists
+Datagran key does a retrieve, reply is key=value if it exists
 
 Implements and conforms to [Unusual Database Program] https://protohackers.com/problem/4
 "

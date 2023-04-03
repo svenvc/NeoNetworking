@@ -1,7 +1,7 @@
 "
 I am AbstractNetworkServer, a framework for a network service listening on a socket, accepting and servicing client connections.
 
-I am meant to be subclassed to implement specific protocols. Consider overwriting almost every method, if needed.
+I am meant to be subclassed to implement specific protocols. Consider overwriting almost any method, if needed.
 
 I offer process management (start, stop), configuration (host, port), constants and transcript logging.
 
