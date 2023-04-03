@@ -17,7 +17,7 @@ Class {
 
 { #category : #protocol }
 BasicUDPServer >> handleDatagram: datagram [
-	self log: ('Echoing {1}' format: { datagram }).
+	self log: [ 'Echoing {1}' format: { datagram } ].
 	sender send: datagram
 ]
 

@@ -50,7 +50,7 @@ BasicTCPServer >> handleConnection: stream [
 	[ stream atEnd ] whileFalse: [
 		"Be extra careful, EOF is often only seen after reading"
 		stream next ifNotNil: [ :byte |
-			self log: ('Echoing byte: {1}' format: { byte }).
+			self log: [ 'Echoing byte: {1}' format: { byte } ].
 			stream nextPut: byte; flush ] ]
 ]
 

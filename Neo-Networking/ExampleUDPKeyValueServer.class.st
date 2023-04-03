@@ -16,11 +16,16 @@ Class {
 	#category : #'Neo-Networking'
 }
 
+{ #category : #accessing }
+ExampleUDPKeyValueServer >> data [
+	^ data
+]
+
 { #category : #protocol }
 ExampleUDPKeyValueServer >> handleDatagram: datagram [
 	| request |
 	request := datagram contents utf8Decoded.
-	self log: ('Received {1} {2}' format: { datagram. request }).
+	self log: [ 'Received {1} {2}' format: { datagram. request } ].
 	(request includes: $=)
 		ifTrue: [
 			(request copyUpTo: $=) = #version
@@ -28,7 +33,7 @@ ExampleUDPKeyValueServer >> handleDatagram: datagram [
 		ifFalse: [
 			data at: request ifPresent: [ :value | | reply |
 				reply := '{1}={2}' format: { request. value }.
-				self log: ('Answered {1}' format: { reply }).
+				self log: [ 'Answered {1} {2}' format: { reply. datagram addressPort } ].
 				sender sendDatagram: reply utf8Encoded inReplyTo: datagram ] ]
 ]
 

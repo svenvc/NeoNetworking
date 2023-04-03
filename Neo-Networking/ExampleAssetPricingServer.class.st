@@ -38,7 +38,7 @@ ExampleAssetPricingServer >> readCommand: stream [
 	| bytes byteStream key first second |
 	^ [
 		bytes := stream next: 9.
-		self log: ('Read command {1}' format: { bytes hex asUppercase }).
+		self log: [ 'Read command {1}' format: { bytes hex asUppercase } ].
 		byteStream := bytes readStream.
 		key := byteStream next.
 		first := byteStream int32.
@@ -53,5 +53,5 @@ ExampleAssetPricingServer >> writeResponse: average to: stream [
 	response := ByteArray streamContents: [ :out |
 		            out int32: average asFloat truncated ].
 	stream nextPutAll: response; flush.
-	self log: ('Wrote response {1}' format: { response hex })
+	self log: [ 'Wrote response {1}' format: { response hex } ]
 ]

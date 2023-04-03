@@ -54,6 +54,12 @@ Datagram >> address: anObject [
 ]
 
 { #category : #accessing }
+Datagram >> addressPort [
+	^ String streamContents: [ :out |
+			self printAddressAndPortOn: out ]
+]
+
+{ #category : #accessing }
 Datagram >> buffer [
 	^ buffer
 ]
@@ -78,6 +84,11 @@ Datagram >> contents: data [
 	self buffer
 		ifNil: [ self setContents: data ]
 		ifNotNil: [ self replaceContents: data ]
+]
+
+{ #category : #testing }
+Datagram >> hasAddressAndPort [
+	^ self address notNil and: [ self port notNil ]
 ]
 
 { #category : #accessing }
@@ -113,6 +124,11 @@ Datagram >> port [
 { #category : #accessing }
 Datagram >> port: anObject [
 	port := anObject
+]
+
+{ #category : #printing }
+Datagram >> printAddressAndPortOn: stream [
+	stream nextPutAll: ($. join: self address); nextPut: $:; print: self port
 ]
 
 { #category : #printing }

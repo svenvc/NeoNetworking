@@ -13,7 +13,8 @@ Class {
 		'port',
 		'timeout',
 		'process',
-		'serverSocket'
+		'serverSocket',
+		'loggingEnabled'
 	],
 	#classVars : [
 		'ManagedServers'
@@ -89,6 +90,27 @@ AbstractNetworkServer >> defaultPort [
 	^ 9999
 ]
 
+{ #category : #logging }
+AbstractNetworkServer >> disableLogging [
+	loggingEnabled := false
+]
+
+{ #category : #logging }
+AbstractNetworkServer >> enableLogging [
+	loggingEnabled := true
+]
+
+{ #category : #initialization }
+AbstractNetworkServer >> initialize [
+	super initialize.
+	self enableLogging
+]
+
+{ #category : #testing }
+AbstractNetworkServer >> isLoggingEnabled [
+	^ loggingEnabled
+]
+
 { #category : #testing }
 AbstractNetworkServer >> isRunning [
 	"Return true when I am running"
@@ -101,20 +123,10 @@ AbstractNetworkServer >> listenLoop [
 	self subclassResponsibility
 ]
 
-{ #category : #private }
+{ #category : #logging }
 AbstractNetworkServer >> log: message [
-	| now |
-	now := DateAndTime now.
-	(String streamContents: [ :out |
-		now printYMDOn: out.
-		out space.
-		now printHMSOn: out.
-		out nextPut: $..
-		out nextPutAll: ((now nanoSecond // 1e6) printPaddedWith: $0 to: 3).
-		out space.
-		Processor activeProcess hash printOn: out base: 36 length: 6 padded: true.
-		out space.
-		out nextPutAll: message ]) traceCr
+	loggingEnabled
+		ifTrue: [ (self renderLogMessage: message) traceCr ]
 ]
 
 { #category : #accessing }
@@ -135,6 +147,22 @@ AbstractNetworkServer >> printOn: stream [
 		ifTrue: [ stream << #running; space; print: self actualPort ]
 		ifFalse: [ stream print: self port ].
 	stream << $)
+]
+
+{ #category : #logging }
+AbstractNetworkServer >> renderLogMessage: message [
+	| now |
+	now := DateAndTime now.
+	^ String streamContents: [ :out |
+		now printYMDOn: out.
+		out space.
+		now printHMSOn: out.
+		out nextPut: $..
+		out nextPutAll: ((now nanoSecond // 1e6) printPaddedWith: $0 to: 3).
+		out space.
+		Processor activeProcess hash printOn: out base: 36 length: 6 padded: true.
+		out space.
+		out nextPutAll: message value ]
 ]
 
 { #category : #accessing }

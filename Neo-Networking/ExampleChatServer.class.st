@@ -63,7 +63,7 @@ ExampleChatServer >> readLineFrom: input [
 		on: ConnectionTimedOut do: [ #continue ] ]
 			on: Error do: [ nil ].
 		line = #continue ] whileTrue.
-	self log: ('Read {1}' format: { line }).
+	self log: [ 'Read {1}' format: { line } ].
 	^ line
 ]
 
@@ -75,6 +75,6 @@ ExampleChatServer >> stop: boolean [
 
 { #category : #protocol }
 ExampleChatServer >> writeLine: line to: output [
-	self log: ('Wrote {1}' format: { line }).
+	self log: [ 'Wrote {1}' format: { line } ].
 	^ [ output nextPutAll: line; lf; flush ] on: Error do: [ nil ]
 ]
