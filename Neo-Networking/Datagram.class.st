@@ -74,12 +74,12 @@ Datagram >> capacity [
 	^ buffer ifNil: [ 0 ] ifNotNil: [ buffer size ]
 ]
 
-{ #category : #accessing }
+{ #category : #public }
 Datagram >> contents [
 	^ self buffer copyFrom: 1 to: self length
 ]
 
-{ #category : #accessing }
+{ #category : #public }
 Datagram >> contents: data [
 	self buffer
 		ifNil: [ self setContents: data ]
@@ -137,30 +137,31 @@ Datagram >> printOn: stream [
 	stream nextPut: $(.
 	self isEmpty
 		ifFalse: [ self contents printHexOn: stream ].
-	(self address notNil and: [ self port notNil ])
+	self hasAddressAndPort
 		ifTrue: [
 			self isEmpty ifFalse: [ stream space ].
-			stream nextPutAll: ($. join: self address); nextPut: $:; print: self port ].
+			self printAddressAndPortOn: stream ].
 	stream nextPut: $)
 ]
 
-{ #category : #accessing }
+{ #category : #public }
 Datagram >> readStream [
 	^ ReadStream on: self buffer from: 1 to: self length
 ]
 
-{ #category : #accessing }
+{ #category : #public }
 Datagram >> replaceContents: data [
 	self buffer replaceFrom: 1 to: data size with: data startingAt: 1.
 	self length: data size
 ]
 
-{ #category : #accessing }
+{ #category : #public }
 Datagram >> reset [
-	length := 0
+	length := 0.
+	address := port := nil
 ]
 
-{ #category : #accessing }
+{ #category : #public }
 Datagram >> setContents: data [
 	self buffer: data.
 	self length: data size
@@ -169,4 +170,12 @@ Datagram >> setContents: data [
 { #category : #accessing }
 Datagram >> size [
 	^ self length
+]
+
+{ #category : #testing }
+Datagram >> wasReceived [
+	"Return true when I am the result of the reception of a packet, if an empty one"
+
+	^ self hasAddressAndPort
+			and: [ self address ~= #[0 0 0 0] and: [ self port isZero not ] ]
 ]

@@ -86,6 +86,14 @@ UDPListener >> delay [
 	^ delay ifNil: [ delay := Delay forMilliseconds: self defaultDelay ]
 ]
 
+{ #category : #private }
+UDPListener >> didReceive: result [
+	"Return true when the result of #primitiveReceive: indicates a UDP packet was received.
+	In order to be able to receive empty packets we have to look if the peer address:port is set"
+
+	^ result second ~= #[ 0 0 0 0 ] and: [ result third ~= 0 ]
+]
+
 { #category : #testing }
 UDPListener >> hasSocket [
 	^ socket notNil
@@ -145,12 +153,12 @@ UDPListener >> printOn: stream [
 		nextPut: $)
 ]
 
-{ #category : #accessing }
+{ #category : #public }
 UDPListener >> receive: receivingDatagram [
 	| result |
 	[
 		result := self primitiveReceive: receivingDatagram buffer.
-		result first isZero ] whileTrue: [ self delay wait ].
+		self didReceive: result ] whileFalse: [ self delay wait ].
 	packetCount := packetCount + 1.
 	byteCount := byteCount + result first.
 	^ receivingDatagram
@@ -160,12 +168,12 @@ UDPListener >> receive: receivingDatagram [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : #public }
 UDPListener >> receiveDatagram [
 	^ self receive: self datagram
 ]
 
-{ #category : #accessing }
+{ #category : #public }
 UDPListener >> receiveDatagram: receivingDatagram timeout: seconds [
 	| delayWaitCount result |
 	delayWaitCount := seconds * 1000 / self delay millisecondDelayDuration.
@@ -177,11 +185,9 @@ UDPListener >> receiveDatagram: receivingDatagram timeout: seconds [
 			ifNotNil: [
 				self primitiveReceive: receivingDatagram buffer ].
 		delayWaitCount := delayWaitCount - 1.
-		result first isZero and: [ delayWaitCount > 0 ] ] whileTrue: [ self delay wait ].
-	result first isZero
-		ifFalse: [
-			packetCount := packetCount + 1.
-			byteCount := byteCount + result first ].
+		(self didReceive: result) not and: [ delayWaitCount > 0 ] ] whileTrue: [ self delay wait ].
+	packetCount := packetCount + 1.
+	byteCount := byteCount + result first.
 	^ receivingDatagram
 		length: result first;
 		address: result second;
@@ -189,7 +195,7 @@ UDPListener >> receiveDatagram: receivingDatagram timeout: seconds [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : #public }
 UDPListener >> receiveDatagramTimeout: seconds [
 	^ self
 		receiveDatagram: self datagram

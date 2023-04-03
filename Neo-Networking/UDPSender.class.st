@@ -90,6 +90,8 @@ UDPSender >> packetCount [
 { #category : #private }
 UDPSender >> primitiveSend: bytes length: length host: host port: port [
 	| totalSent sent toSent |
+	length = 0
+		ifTrue: [ ^ self sendEmptyUDPPacketToHost: host port: port ].
 	totalSent := 0.
 	[ totalSent < length ] whileTrue: [
 		(self socket waitForSendDoneFor: self timeout)
@@ -119,7 +121,7 @@ UDPSender >> printOn: stream [
 		nextPut: $)
 ]
 
-{ #category : #accessing }
+{ #category : #public }
 UDPSender >> send: datagram [
 	^ self
 		primitiveSend: datagram buffer
@@ -128,7 +130,7 @@ UDPSender >> send: datagram [
 		port: datagram port
 ]
 
-{ #category : #accessing }
+{ #category : #public }
 UDPSender >> sendDatagram: bytes inReplyTo: datagram [
 	^ self
 		sendDatagram: bytes
@@ -136,7 +138,7 @@ UDPSender >> sendDatagram: bytes inReplyTo: datagram [
 		port: datagram port
 ]
 
-{ #category : #accessing }
+{ #category : #public }
 UDPSender >> sendDatagram: bytes toHost: host port: port [
 	| address |
 	address := host isString
@@ -147,6 +149,20 @@ UDPSender >> sendDatagram: bytes toHost: host port: port [
 		length: bytes size
 		host: address
 		port: port
+]
+
+{ #category : #private }
+UDPSender >> sendEmptyUDPPacketToHost: host port: port [
+	(self socket waitForSendDoneFor: self timeout)
+		ifFalse: [ ConnectionTimedOut signal: 'UDP send timed out' ].
+	self socket
+		primSocket: socket socketHandle
+		sendUDPData: #[]
+		toHost: host
+		port: port
+		startIndex: 1
+		count: 0.
+	^ 0
 ]
 
 { #category : #accessing }

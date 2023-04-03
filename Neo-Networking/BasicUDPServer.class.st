@@ -27,7 +27,7 @@ BasicUDPServer >> listenLoop [
 	[ [
 		| datagram |
 		datagram := listener receiveDatagramTimeout: self timeout.
-		datagram isEmpty ifFalse: [ self handleDatagram: datagram ] ] repeat ]
+		datagram wasReceived ifTrue: [ self handleDatagram: datagram ] ] repeat ]
 			ifCurtailed: [ self tearDown ]
 ]
 
