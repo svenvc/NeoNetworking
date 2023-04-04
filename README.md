@@ -1,11 +1,27 @@
 # NeoNetworking
 Networking tools for Pharo
 
-This package contains a small framework to setup up TCP or UDP network servers/services. 
+This package contains a small framework to set up TCP or UDP network servers/services. 
 By subclassing and overwriting just a couple of methods you get a working server for a specific protocol.
 
+The class **AbstractNetworkServer** offers process management (start, stop), configuration (port), constants and (transcript) logging.
+The subclass **BasicTCPServer** is a framework for a TCP network service listening on a socket, accepting and servicing client connections, 
+forking a connection handler process to service each client.
+The subclass **BasicUDPServer** is a framework for a UDP network service listening on a socket, accepting and servicing incoming datagrams, handle incoming datagrams in its main process.
+Both are also concrete classes acting as an RFC 862 Echo service.
+
 Check out the class comments and the examples with their unit tests.
+
 Together they implement and satisfy the first 5 problems of https://protohackers.com/
+- problem 0 [Smoke Test](https://protohackers.com/problem/0) solution [BasicTCPServer](https://github.com/svenvc/NeoNetworking/blob/main/Neo-Networking/BasicTCPServer.class.st)
+- problem 1 [Pime Test](https://protohackers.com/problem/1) solution [ExamplePrimeTestPServer](https://github.com/svenvc/NeoNetworking/blob/main/Neo-Networking/ExamplePrimeTestServer.class.st)
+- problem 2 [Means to an End](https://protohackers.com/problem/2) solution [ExampleAssetPricingServer](https://github.com/svenvc/NeoNetworking/blob/main/Neo-Networking/ExampleAssetPricingServer.class.st)
+- problem 3 [Budget Chat](https://protohackers.com/problem/3) solution [ExampleChatServer](https://github.com/svenvc/NeoNetworking/blob/main/Neo-Networking/ExampleChatServer.class.st)
+- problem 4 [Unusual Database Program](https://protohackers.com/problem/4) solution [ExampleUDPKeyValueServer](https://github.com/svenvc/NeoNetworking/blob/main/Neo-Networking/ExampleUDPKeyValueServer.class.st)
+
+For each solution there are unit tests containing client code exercising each protocol.
+
+The classes Datagram, UDPSender and UDPListener improve upon the basic UDP functionality is the system class Socket.
 
 Here is an example session installing, deploying, starting and running one of the examples:
 
@@ -57,3 +73,5 @@ Escape character is '^]'.
 {"method":"isPrime","number":997}
 {"method":"isPrime","prime":true}
 ````
+
+Happy hacking !
